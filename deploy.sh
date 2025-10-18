@@ -42,16 +42,6 @@ else
   echo "✅ Fichier PEM déjà présent : ${SSH_PEM}"
 fi
 
-# === 4️⃣ Clonage du dépôt GitHub
-if [ ! -d "TheStoreMain" ]; then
-  echo "📥 Clonage du dépôt GitHub public..."
-  git clone https://github.com/ZakMelouk/TheStoreMain.git
-else
-  echo "✅ Dépôt GitHub déjà présent."
-fi
-
-cd TheStoreMain
-
 # === 5️⃣ Initialisation et déploiement Terraform
 echo "⚙️ Initialisation de Terraform..."
 terraform init -no-color -upgrade
