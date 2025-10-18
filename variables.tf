@@ -62,7 +62,7 @@ variable "catalog_db_username" {
 variable "catalog_engine_version" {
   description = "MySQL engine version"
   type        = string
-  default     = "8.0.36"
+  default     = "8.0"
 }
 
 variable "catalog_instance_class" {
@@ -99,3 +99,4 @@ variable "aws_region" {
   type        = string
   default     = "us-east-1"
 }
+
