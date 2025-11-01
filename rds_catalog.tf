@@ -32,6 +32,8 @@ resource "aws_db_parameter_group" "catalog_pg" {
 resource "random_password" "catalog_password" {
   length  = 20
   special = true
+  override_special = "!#$%^&*()_+=-[]{}:;,.?~" # pas de /, @, "
+
 }
 
 resource "aws_secretsmanager_secret" "catalog_db_secret" {
@@ -87,3 +89,4 @@ resource "aws_db_instance" "catalog" {
 
   depends_on = [aws_internet_gateway.igw]
 }
+
