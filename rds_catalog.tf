@@ -87,6 +87,22 @@ resource "aws_db_instance" "catalog" {
     Environment = var.environment
   }
 
-  depends_on = [aws_internet_gateway.igw]
+  depends_on = [aws_internet_gateway.igw,
+  aws_secretsmanager_secret_version.catalog_db_secret_v,
+  aws_secretsmanager_secret_policy.catalog_allow_voclabs]
 }
+data "aws_caller_identity" "current" {}
 
+resource "aws_secretsmanager_secret_policy" "catalog_allow_voclabs" {
+  secret_arn = aws_secretsmanager_secret.catalog_db_secret.arn
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Sid       = "AllowVoclabsRead",
+      Effect    = "Allow",
+      Principal = { AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/voclabs" },
+      Action    = ["secretsmanager:DescribeSecret","secretsmanager:GetSecretValue"],
+      Resource  = "*"
+    }]
+  })
+}
