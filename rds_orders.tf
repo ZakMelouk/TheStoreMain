@@ -32,6 +32,8 @@ resource "aws_db_parameter_group" "orders_pg" {
 resource "random_password" "orders_password" {
   length           = 20
   special          = true
+  override_special = "!#$%^&*()_+=-[]{}:;,.?~" # pas de /, @, "
+
 }
 
 resource "aws_secretsmanager_secret" "orders_db_secret" {
@@ -90,3 +92,4 @@ resource "aws_db_instance" "orders" {
 
   depends_on = [aws_internet_gateway.igw]
 }
+
