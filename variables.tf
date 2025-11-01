@@ -26,7 +26,7 @@ variable "orders_db_username" {
 variable "orders_engine_version" {
   description = "PostgreSQL engine version"
   type        = string
-  default     = "14.12"
+  default     = "14.19"
 }
 
 variable "orders_instance_class" {
@@ -99,4 +99,5 @@ variable "aws_region" {
   type        = string
   default     = "us-east-1"
 }
+
 
