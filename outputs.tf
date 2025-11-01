@@ -32,3 +32,15 @@ output "catalog_db_secret_arn" {
   description = "ARN of the Secrets Manager secret for Catalog DB credentials"
   value       = aws_secretsmanager_secret.catalog_db_secret.arn
 }
+
+output "catalog_db_name" {
+  description = "Database name for Catalog MySQL"
+  value       = var.catalog_db_name
+}
+
+output "catalog_db_username" {
+  description = "Database username for Catalog MySQL"
+  value       = var.catalog_db_username
+}
+
+
