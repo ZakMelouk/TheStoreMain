@@ -3,8 +3,7 @@ set -euo pipefail
 
 # --- CONFIG ---
 AWS_REGION="eu-west-3"
-SECRET_NAME="catalog-db-credentials"
-TF_DIR="."         # dossier contenant ton code Terraform
+TF_DIR="./terraform"         # dossier contenant ton code Terraform
 OUTPUT_FILE=".env"
 
 # --- Vérifications ---
@@ -15,13 +14,15 @@ echo "==> Lecture des outputs Terraform..."
 RDS_ENDPOINT=$(cd "$TF_DIR" && terraform output -raw catalog_rds_endpoint)
 DB_NAME=$(cd "$TF_DIR" && terraform output -raw catalog_db_name)
 DB_USER=$(cd "$TF_DIR" && terraform output -raw catalog_db_username)
+SECRET_ARN=$(cd "$TF_DIR" && terraform output -raw catalog_secret_arn)  # ✅ nouvel output
 
 echo "==> Récupération du mot de passe dans Secrets Manager..."
 RAW_SECRET=$(aws secretsmanager get-secret-value \
   --region "$AWS_REGION" \
-  --secret-id "$SECRET_NAME" \
-  --query 'SecretString' --output text)
+  --secret-id "$SECRET_ARN" \
+  --query 'SecretString' --output text)  # ✅ on utilise l’ARN, pas le nom
 
+export RAW_SECRET   # ✅ rendre dispo pour le process Python ci-dessous
 DB_PASSWORD=$(python3 - <<'PY'
 import json, os
 print(json.loads(os.environ["RAW_SECRET"])["password"])
@@ -40,7 +41,7 @@ EOF
 
 echo ""
 echo "✅ Fichier .env créé avec succès :"
-cat "$OUTPUT_FILE" | sed 's/DB_PASSWORD=.*/DB_PASSWORD=****/'
+sed 's/DB_PASSWORD=.*/DB_PASSWORD=****/' "$OUTPUT_FILE"
 echo ""
 echo "➡️ Copie ce fichier .env dans VS Code (à la racine du projet)"
 echo "➡️ Puis exécute : docker compose up -d --build"
