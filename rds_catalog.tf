@@ -112,7 +112,7 @@ resource "aws_db_instance" "catalog" {
 ###############################################
 # 5️⃣ SEED automatique (exécuté après RDS UP)
 ###############################################
-# Chemin du fichier SQL : ${path.module}/seed/catalog_seed.sql
+# Chemin du fichier SQL : ${path.module}/catalog_seed.sql
 # Le conteneur mysql:8 est utilisé pour éviter d'installer mysql client sur l'hôte.
 resource "null_resource" "seed_catalog" {
   triggers = {
@@ -122,11 +122,12 @@ resource "null_resource" "seed_catalog" {
 
   provisioner "local-exec" {
   interpreter = ["/bin/bash", "-lc"]
-  command = "docker run --rm --env MYSQL_PWD='${random_password.catalog_password.result}' -v ${path.module}:/seed mysql:8 sh -c \"mysql -h ${aws_db_instance.catalog.address} -P 3306 -u ${var.catalog_db_username} ${var.catalog_db_name} < /seed/catalog_seed.sql\""
+  command = "docker run --rm --env MYSQL_PWD='${random_password.catalog_password.result}' -v ${path.module}:/seed mysql:8 sh -c \"mysql -h ${aws_db_instance.catalog.address} -P 3306 -u ${var.catalog_db_username} ${var.catalog_db_name} < /catalog_seed.sql\""
 }
 
 
   depends_on = [aws_db_instance.catalog]
 }
+
 
 
