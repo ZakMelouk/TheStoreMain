@@ -115,15 +115,13 @@ resource "aws_db_instance" "catalog" {
 # Chemin du fichier SQL : ${path.module}/seed/catalog_seed.sql
 # Le conteneur mysql:8 est utilisé pour éviter d'installer mysql client sur l'hôte.
 resource "null_resource" "seed_catalog" {
-  # Re-exécuter si endpoint ou contenu du fichier change
   triggers = {
     endpoint = aws_db_instance.catalog.address
-    checksum = filesha256("${path.module}/catalog_seed.sql")  # <- même dossier que ce .tf
+    checksum = filesha256("${path.module}/catalog_seed.sql")  # le fichier est dans le même dossier que ce .tf
   }
 
   provisioner "local-exec" {
-    # (petit plus) force bash pour éviter les erreurs de quoting/multilignes
-    interpreter = ["/bin/bash", "-lc"]
+    interpreter = ["/bin/bash", "-lc"]   # ← important
     command = <<EOT
 docker run --rm \
   -e MYSQL_PWD='${random_password.catalog_password.result}' \
@@ -135,3 +133,4 @@ EOT
 
   depends_on = [aws_db_instance.catalog]
 }
+
