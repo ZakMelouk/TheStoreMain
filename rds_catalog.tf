@@ -1,4 +1,4 @@
-###############################################
+  ###############################################
 # RDS MySQL for Catalog (private)
 ###############################################
 
@@ -121,16 +121,12 @@ resource "null_resource" "seed_catalog" {
   }
 
   provisioner "local-exec" {
-    interpreter = ["/bin/bash", "-lc"]   # ← important
-    command = <<EOT
-docker run --rm \
-  -e MYSQL_PWD='${random_password.catalog_password.result}' \
-  -v ${path.module}:/seed \
-  mysql:8 \
-  sh -c "mysql -h ${aws_db_instance.catalog.address} -P 3306 -u ${var.catalog_db_username} ${var.catalog_db_name} < /seed/catalog_seed.sql"
-EOT
-  }
+  interpreter = ["/bin/bash", "-lc"]
+  command = "docker run --rm --env MYSQL_PWD='${random_password.catalog_password.result}' -v ${path.module}:/seed mysql:8 sh -c \"mysql -h ${aws_db_instance.catalog.address} -P 3306 -u ${var.catalog_db_username} ${var.catalog_db_name} < /seed/catalog_seed.sql\""
+}
+
 
   depends_on = [aws_db_instance.catalog]
 }
+
 
