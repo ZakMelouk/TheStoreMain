@@ -115,24 +115,23 @@ resource "aws_db_instance" "catalog" {
 # Chemin du fichier SQL : ${path.module}/seed/catalog_seed.sql
 # Le conteneur mysql:8 est utilisé pour éviter d'installer mysql client sur l'hôte.
 resource "null_resource" "seed_catalog" {
-  # Re-exécuter si endpoint ou fichier SQL change
+  # Re-exécuter si endpoint ou contenu du fichier change
   triggers = {
     endpoint = aws_db_instance.catalog.address
-    checksum = filesha256("${path.module}/catalog_seed.sql")
+    checksum = filesha256("${path.module}/catalog_seed.sql")  # <- même dossier que ce .tf
   }
 
   provisioner "local-exec" {
-    # ⚠️ Cette commande tourne sur la machine qui fait "terraform apply"
-    # Prérequis: Docker installé et accès réseau au port 3306 de la RDS.
+    # (petit plus) force bash pour éviter les erreurs de quoting/multilignes
+    interpreter = ["/bin/bash", "-lc"]
     command = <<EOT
 docker run --rm \
   -e MYSQL_PWD='${random_password.catalog_password.result}' \
-  -v ${path.module}/seed:/seed mysql:8 \
+  -v ${path.module}:/seed \
+  mysql:8 \
   sh -c "mysql -h ${aws_db_instance.catalog.address} -P 3306 -u ${var.catalog_db_username} ${var.catalog_db_name} < /seed/catalog_seed.sql"
 EOT
   }
 
   depends_on = [aws_db_instance.catalog]
 }
-
-
