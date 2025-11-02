@@ -135,21 +135,4 @@ EOT
   depends_on = [aws_db_instance.catalog]
 }
 
-###############################################
-# 6️⃣ Outputs utiles
-###############################################
-output "catalog_rds_endpoint" {
-  value = aws_db_instance.catalog.address
-}
 
-output "catalog_db_name" {
-  value = var.catalog_db_name
-}
-
-output "catalog_db_username" {
-  value = var.catalog_db_username
-}
-
-output "catalog_secret_arn" {
-  value = aws_secretsmanager_secret.catalog_db_secret.arn
-}
