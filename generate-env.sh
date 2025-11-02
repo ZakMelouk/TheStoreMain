@@ -3,7 +3,7 @@ set -euo pipefail
 
 # --- CONFIG ---
 AWS_REGION="eu-west-3"
-TF_DIR="./terraform"         # dossier contenant ton code Terraform
+TF_DIR="."         # dossier contenant ton code Terraform
 OUTPUT_FILE=".env"
 
 # --- Vérifications ---
