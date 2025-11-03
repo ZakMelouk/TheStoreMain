@@ -82,7 +82,7 @@ resource "aws_db_instance" "catalog" {
   db_subnet_group_name   = aws_db_subnet_group.catalog_subnets.name
   vpc_security_group_ids = [aws_security_group.sg_db.id]
   publicly_accessible    = false
-  multi_az               = false
+  multi_az               = true
 
   username             = var.catalog_db_username
   password             = random_password.catalog_password.result
@@ -108,5 +108,6 @@ resource "aws_db_instance" "catalog" {
     aws_secretsmanager_secret_policy.catalog_allow_voclabs
   ]
 }
+
 
 
