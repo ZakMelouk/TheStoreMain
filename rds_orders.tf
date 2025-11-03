@@ -67,7 +67,7 @@ resource "aws_db_instance" "orders" {
   db_subnet_group_name    = aws_db_subnet_group.orders_subnets.name
   vpc_security_group_ids  = [aws_security_group.sg_db.id]
   publicly_accessible     = false          # ❗ privé
-  multi_az                = false          # POC : false. Prod : true
+  multi_az                = true          
 
   # Auth
   username                = var.orders_db_username
@@ -92,4 +92,5 @@ resource "aws_db_instance" "orders" {
 
   depends_on = [aws_internet_gateway.igw]
 }
+
 
