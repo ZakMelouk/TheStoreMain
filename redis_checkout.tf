@@ -42,5 +42,5 @@ resource "aws_elasticache_cluster" "checkout" {
     Environment = var.environment
   }
 
-  depends_on = [aws_internet_gateway.igw]
 }
+
