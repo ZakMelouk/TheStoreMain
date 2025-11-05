@@ -52,6 +52,14 @@ resource "aws_eip" "nat_eip" {
     Name = "the-store-nat-eip"
   }
 }
+# Elastic IP pour la 2ème NAT Gateway (AZ b)
+resource "aws_eip" "nat_eip_b" {
+  domain = "vpc"
+  tags = {
+    Name = "the-store-nat-eip-b"
+  }
+}
+
 
 # =============================
 # NAT Gateway (sortie Internet pour les subnets privés,publique, mais utilisée pour le trafic privé)
@@ -65,6 +73,18 @@ resource "aws_nat_gateway" "nat" {
 
   depends_on = [aws_internet_gateway.igw]
 }
+
+resource "aws_nat_gateway" "nat_b" {
+  allocation_id = aws_eip.nat_eip_b.id
+  subnet_id     = aws_subnet.public_b.id
+
+  tags = {
+    Name = "the-store-nat-b"
+  }
+
+  depends_on = [aws_internet_gateway.igw]
+}
+
 
 # =============================
 # Table de routage privée
@@ -109,5 +129,6 @@ resource "aws_route_table_association" "app_d" {
   subnet_id      = aws_subnet.private_d.id
   route_table_id = aws_route_table.private.id
 }
+
 
 
