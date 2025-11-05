@@ -49,7 +49,8 @@ output "cart_dynamodb_table_name" {
 output "dynamodb_vpc_endpoint_id" {
   description = "ID of the VPC Endpoint for DynamoDB"
   value       = aws_vpc_endpoint.dynamodb.id
-}output "vpc_id" {
+}
+output "vpc_id" {
   description = "Main VPC ID"
   value       = aws_vpc.main.id
 }
@@ -77,3 +78,4 @@ output "k8s_worker_private_ips" {
   description = "Private IPs of the Kubernetes worker nodes"
   value       = [for w in aws_instance.k8s_worker : w.private_ip]
 }
+
