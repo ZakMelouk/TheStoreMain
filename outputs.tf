@@ -44,7 +44,7 @@ output "redis_port" {
 }
 output "cart_dynamodb_table_name" {
   description = "Name of the DynamoDB table for Cart service"
-  value       = aws_dynamodb_table.cart_items.name
+  value       = aws_dynamodb_table.cart.name
 }
 output "dynamodb_vpc_endpoint_id" {
   description = "ID of the VPC Endpoint for DynamoDB"
