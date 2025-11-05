@@ -22,7 +22,27 @@ resource "aws_subnet" "private_b" {
     Name = "private-subnet-b"
   }
 }
+resource "aws_subnet" "private_c" {
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = "10.0.5.0/24"
+  availability_zone = "us-east-1a"
+  map_public_ip_on_launch = false
 
+  tags = {
+    Name = "private-subnet-c"
+  }
+}
+
+resource "aws_subnet" "private_d" {
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = "10.0.6.0/24"
+  availability_zone = "us-east-1b"
+  map_public_ip_on_launch = false
+
+  tags = {
+    Name = "private-subnet-d"
+  }
+}
 # =============================
 # Elastic IP (pour la NAT Gateway)
 # =============================
@@ -34,7 +54,7 @@ resource "aws_eip" "nat_eip" {
 }
 
 # =============================
-# NAT Gateway (sortie Internet pour les subnets privés)
+# NAT Gateway (sortie Internet pour les subnets privés,publique, mais utilisée pour le trafic privé)
 # =============================
 resource "aws_nat_gateway" "nat" {
   allocation_id = aws_eip.nat_eip.id
@@ -62,15 +82,28 @@ resource "aws_route_table" "private" {
   }
 }
 
+
+
 # =============================
 # Associations entre subnets privés et table privée
 # =============================
-resource "aws_route_table_association" "private_a" {
+resource "aws_route_table_association" "db_a" {
   subnet_id      = aws_subnet.private_a.id
+  route_table_id = aws_route_table.private_db.id
+}
+
+resource "aws_route_table_association" "db_b" {
+  subnet_id      = aws_subnet.private_b.id
+  route_table_id = aws_route_table.private_db.id
+}
+resource "aws_route_table_association" "app_c" {
+  subnet_id      = aws_subnet.private_c.id
   route_table_id = aws_route_table.private.id
 }
 
-resource "aws_route_table_association" "private_b" {
-  subnet_id      = aws_subnet.private_b.id
+resource "aws_route_table_association" "app_d" {
+  subnet_id      = aws_subnet.private_d.id
   route_table_id = aws_route_table.private.id
 }
+
+
