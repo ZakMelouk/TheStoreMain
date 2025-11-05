@@ -145,7 +145,7 @@ resource "aws_security_group" "sg_redis" {
 }
 
 resource "aws_security_group" "sg_k8s_nodes" {
-  name   = "sg-k8s-nodes"
+  name   = "k8s-nodes-sg"
   vpc_id = aws_vpc.main.id
 
   # SSH depuis le bastion uniquement
@@ -176,3 +176,4 @@ resource "aws_security_group" "sg_k8s_nodes" {
 
   tags = { Name = "sg-k8s-nodes" }
 }
+
