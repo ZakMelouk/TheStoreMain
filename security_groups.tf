@@ -143,3 +143,36 @@ resource "aws_security_group" "sg_redis" {
     Name = "redis-sg"
   }
 }
+
+resource "aws_security_group" "sg_k8s_nodes" {
+  name   = "sg-k8s-nodes"
+  vpc_id = aws_vpc.main.id
+
+  # SSH depuis le bastion uniquement
+  ingress {
+    description     = "SSH from bastion"
+    from_port       = 22
+    to_port         = 22
+    protocol        = "tcp"
+    security_groups = [aws_security_group.sg_bastion.id]
+  }
+
+  # Intra-cluster (simple et efficace)
+  ingress {
+    description = "All within k8s nodes"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    self        = true
+  }
+
+  # Sortie Internet (via NAT)
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = { Name = "sg-k8s-nodes" }
+}
