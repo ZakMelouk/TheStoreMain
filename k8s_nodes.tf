@@ -61,27 +61,4 @@ resource "aws_instance" "k8s_worker" {
   depends_on = [aws_nat_gateway.nat]
 }
 
-# 3) Outputs (IP privées)
-output "k8s_master_private_ip" {
-  description = "Adresse privée du nœud master"
-  value       = aws_instance.k8s_master.private_ip
-}
 
-output "k8s_worker_private_ips" {
-  description = "Adresses privées des nœuds workers"
-  value       = [for w in aws_instance.k8s_worker : w.private_ip]
-}
-
-# 4) Inventory Ansible (privé + ProxyJump via bastion EIP)
-# NOTE: utilisateur = ec2-user pour Amazon Linux 2 ; si tu passes sur Ubuntu, remplace par 'ubuntu'
-output "ansible_inventory" {
-  value = <<EOT
-[k8s_master]
-${aws_instance.k8s_master.private_ip} ansible_user=ec2-user ansible_ssh_private_key_file=the-store-bastion-key.pem ansible_ssh_common_args='-o ProxyJump=ec2-user@${aws_eip.bastion_eip.public_ip}'
-
-[k8s_workers]
-%{ for w in aws_instance.k8s_worker ~}
-${w.private_ip} ansible_user=ec2-user ansible_ssh_private_key_file=the-store-bastion-key.pem ansible_ssh_common_args='-o ProxyJump=ec2-user@${aws_eip.bastion_eip.public_ip}'
-%{ endfor ~}
-EOT
-}
