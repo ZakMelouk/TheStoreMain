@@ -82,6 +82,10 @@ resource "aws_route_table" "private" {
   }
 }
 
+resource "aws_route_table" "private_db" {
+  vpc_id = aws_vpc.main.id
+  tags   = { Name = "rt-private-db" }
+}
 
 
 # =============================
