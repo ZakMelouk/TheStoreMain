@@ -90,7 +90,7 @@ resource "aws_db_instance" "orders" {
     Environment = var.environment
   }
 
-  depends_on = [aws_internet_gateway.igw]
 }
+
 
 
