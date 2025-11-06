@@ -1,65 +1,65 @@
 #!/bin/bash
 set -e
 
-echo "🚀 Déploiement automatisé de TheStore"
+echo "🚀 Automated deployment of TheStore"
 
-# === 1️⃣ Installation de Terraform si absent
+# === 1️⃣ Install Terraform if not already present
 if ! command -v terraform &> /dev/null
 then
-  echo "📦 Installation de Terraform..."
+  echo "📦 Installing Terraform..."
   curl -fsSL -o terraform.zip https://releases.hashicorp.com/terraform/1.8.5/terraform_1.8.5_linux_amd64.zip
   unzip -q terraform.zip
   mkdir -p ~/bin
   mv terraform ~/bin/
   export PATH="$HOME/bin:$PATH"
   rm terraform.zip
-  echo "✅ Terraform installé avec succès."
+  echo "✅ Terraform successfully installed."
 else
-  echo "✅ Terraform déjà présent."
+  echo "✅ Terraform already installed."
 fi
 
-# === 2️⃣ Génération de la clé SSH locale
+# === 2️⃣ Generate local SSH key
 SSH_DIR="$HOME/.ssh"
 SSH_KEY="$SSH_DIR/the-store-key"
 SSH_PEM="./the-store-bastion-key.pem"
 
 if [ ! -f "${SSH_KEY}" ]; then
-  echo "🔑 Génération d'une nouvelle clé SSH..."
+  echo "🔑 Generating a new SSH key..."
   mkdir -p "$SSH_DIR"
   ssh-keygen -t rsa -b 4096 -f "${SSH_KEY}" -N "" -C "the-store"
   chmod 400 "${SSH_KEY}"
-  echo "✅ Clé SSH générée : ${SSH_KEY}.pub"
+  echo "✅ SSH key generated: ${SSH_KEY}.pub"
 else
-  echo "✅ Clé SSH déjà existante : ${SSH_KEY}.pub"
+  echo "✅ SSH key already exists: ${SSH_KEY}.pub"
 fi
 
-# === 3️⃣ Sauvegarde de la clé privée sous forme PEM (pour l’utilisateur)
+# === 3️⃣ Save private key as PEM (for the user)
 if [ ! -f "${SSH_PEM}" ]; then
   cp "${SSH_KEY}" "${SSH_PEM}"
   chmod 400 "${SSH_PEM}"
-  echo "💾 Copie locale créée : ${SSH_PEM}"
+  echo "💾 Local copy created: ${SSH_PEM}"
 else
-  echo "✅ Fichier PEM déjà présent : ${SSH_PEM}"
+  echo "✅ PEM file already exists: ${SSH_PEM}"
 fi
 
-# === 5️⃣ Initialisation et déploiement Terraform
-echo "⚙️ Initialisation de Terraform..."
+# === 5️⃣ Initialize and deploy Terraform
+echo "⚙️ Initializing Terraform..."
 terraform init -no-color -upgrade
 
-echo "🚀 Lancement du déploiement Terraform..."
+echo "🚀 Running Terraform deployment..."
 terraform apply -auto-approve -var "ssh_public_key=$(cat ~/.ssh/the-store-key.pub)"
 
-# === 6️⃣ Récupération des infos de sortie
+# === 6️⃣ Retrieve output information
 echo ""
-echo "📡 Récupération des informations de déploiement..."
+echo "📡 Retrieving deployment information..."
 BASTION_IP=$(terraform output -raw bastion_public_ip 2>/dev/null || echo "N/A")
 
 echo ""
-echo "🎉 Déploiement terminé avec succès !"
+echo "🎉 Deployment completed successfully!"
 echo "--------------------------------------------"
-echo "🔑 Clé SSH privée sauvegardée : ${SSH_PEM}"
-echo "🌐 IP publique du Bastion : ${BASTION_IP}"
+echo "🔑 Private SSH key saved at: ${SSH_PEM}"
+echo "🌐 Bastion public IP: ${BASTION_IP}"
 echo "--------------------------------------------"
 echo ""
-echo "💡 Pour te connecter :"
+echo "💡 To connect:"
 echo "ssh -i ${SSH_PEM} ec2-user@${BASTION_IP}"
