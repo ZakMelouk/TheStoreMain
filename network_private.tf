@@ -1,5 +1,5 @@
 # =============================
-# Sous-réseaux privés
+# Private subnets
 # =============================
 resource "aws_subnet" "private_a" {
   vpc_id                  = aws_vpc.main.id
@@ -46,7 +46,7 @@ resource "aws_subnet" "private_d" {
 }
 
 # =============================
-# Elastic IP (pour la NAT Gateway)
+# Elastic IP (for the NAT Gateway)
 # =============================
 resource "aws_eip" "nat_eip" {
   domain = "vpc"
@@ -55,7 +55,7 @@ resource "aws_eip" "nat_eip" {
   }
 }
 
-# Elastic IP pour la 2ème NAT Gateway (AZ b)
+# Elastic IP for the 2nd NAT Gateway (AZ b)
 resource "aws_eip" "nat_eip_b" {
   domain = "vpc"
   tags = {
@@ -64,7 +64,7 @@ resource "aws_eip" "nat_eip_b" {
 }
 
 # =============================
-# NAT Gateway (sortie Internet pour les subnets privés)
+# NAT Gateway (Internet access for private subnets)
 # =============================
 resource "aws_nat_gateway" "nat" {
   allocation_id = aws_eip.nat_eip.id
@@ -85,9 +85,9 @@ resource "aws_nat_gateway" "nat_b" {
 }
 
 # =============================
-# Tables de routage privées
+# Private route tables
 # =============================
-# Table privée existante (AZ a) -> NAT A
+# Existing private table (AZ a) -> NAT A
 resource "aws_route_table" "private" {
   vpc_id = aws_vpc.main.id
 
@@ -101,7 +101,7 @@ resource "aws_route_table" "private" {
   }
 }
 
-# Nouvelle table privée (AZ b) -> NAT B  <-- AJOUT MINIMAL
+# New private table (AZ b) -> NAT B  <-- MINIMAL ADDITION
 resource "aws_route_table" "private_b" {
   vpc_id = aws_vpc.main.id
 
@@ -115,16 +115,16 @@ resource "aws_route_table" "private_b" {
   }
 }
 
-# Table privée DB (sans Internet)
+# Private DB table (no Internet access)
 resource "aws_route_table" "private_db" {
   vpc_id = aws_vpc.main.id
   tags   = { Name = "rt-private-db" }
 }
 
 # =============================
-# Associations entre subnets privés et tables privées
+# Associations between private subnets and private route tables
 # =============================
-# DB (isolés)
+# DB (isolated)
 resource "aws_route_table_association" "db_a" {
   subnet_id      = aws_subnet.private_a.id
   route_table_id = aws_route_table.private_db.id
@@ -141,11 +141,12 @@ resource "aws_route_table_association" "app_c" {
   route_table_id = aws_route_table.private.id
 }
 
-# Associe l’AZ b à la table privée b (-> NAT B)  <-- MODIF MINIMALE
+# Associate AZ b to private table b (-> NAT B)  <-- MINIMAL CHANGE
 resource "aws_route_table_association" "app_d" {
   subnet_id      = aws_subnet.private_d.id
   route_table_id = aws_route_table.private_b.id
 }
+
 # =============================
 # VPC Gateway Endpoint for DynamoDB
 # =============================
@@ -164,5 +165,3 @@ resource "aws_vpc_endpoint" "dynamodb" {
     Name = "the-store-dynamodb-endpoint"
   }
 }
-
-
