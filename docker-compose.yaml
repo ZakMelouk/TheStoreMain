@@ -1,0 +1,25 @@
+services:
+  catalog:
+    build:
+      context: .
+    hostname: catalog
+    restart: always
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    env_file: .env
+    environment:
+      GIN_MODE: release
+      RETAIL_CATALOG_PERSISTENCE_PROVIDER: mysql
+      RETAIL_CATALOG_PERSISTENCE_ENDPOINT: "${MYSQL_HOST}:${MYSQL_PORT}"
+      RETAIL_CATALOG_PERSISTENCE_USER: "${DB_USER}"
+      RETAIL_CATALOG_PERSISTENCE_PASSWORD: "${DB_PASSWORD}"
+      RETAIL_CATALOG_PERSISTENCE_DB_NAME: "${DB_NAME}"
+    ports:
+      - "8081:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8080/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
