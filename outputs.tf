@@ -87,5 +87,9 @@ output "catalog_db_username" {
   description = "Master username for Catalog"
   value       = var.catalog_db_username
 }
+output "bastion_public_ip_b" {
+  description = "Elastic IP of the secondary Bastion (AZ-b)"
+  value       = aws_eip.bastion_eip_b.public_ip
+}
 
 
