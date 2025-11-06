@@ -54,6 +54,17 @@ fi
 # === 5️⃣ Initialize and deploy Terraform (in ./terraform)
 echo "⚙️ Initializing Terraform in: $TF_DIR"
 terraform -chdir="$TF_DIR" init -no-color -upgrade
+# --- 🧹 Safety cleanup: remove existing Redis parameter group if needed ---
+echo "🧹 Checking for existing Redis parameter group..."
+if aws elasticache describe-cache-parameter-groups \
+     --cache-parameter-group-name checkout-redis-params >/dev/null 2>&1; then
+  echo "⚠️  Existing parameter group found: deleting it to prevent conflict..."
+  aws elasticache delete-cache-parameter-group \
+    --cache-parameter-group-name checkout-redis-params >/dev/null 2>&1 || true
+  echo "✅ Old Redis parameter group deleted (or deletion already in progress)."
+else
+  echo "✅ No existing Redis parameter group found."
+fi
 
 echo "🚀 Running Terraform deployment..."
 terraform -chdir="$TF_DIR" apply -auto-approve -var "ssh_public_key=$(cat "${SSH_KEY}.pub")"
