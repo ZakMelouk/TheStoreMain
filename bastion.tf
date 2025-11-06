@@ -2,13 +2,13 @@
 # Bastion Host EC2 Instance
 # =============================
 
-# 1️⃣ SSH Key pair (déjà générée en local)
+# 1️⃣ SSH Key pair (already generated locally)
 resource "aws_key_pair" "bastion_key" {
   key_name   = "the-store-bastion-key"
   public_key = var.ssh_public_key
 }
 
-# 2️⃣ Instance EC2 Bastion
+# 2️⃣ EC2 Bastion Instance
 resource "aws_instance" "bastion" {
   ami                    = "ami-0c94855ba95c71c99"  # Amazon Linux 2 (us-east-1)
   instance_type          = "t2.micro"
@@ -21,13 +21,13 @@ resource "aws_instance" "bastion" {
               yum update -y
               yum install -y postgresql mysql redis awscli telnet net-tools git
 
-              # Petit message de bienvenue
+              # Welcome message
               echo "==========================================" >> /etc/motd
               echo " Welcome to The Store Bastion Host " >> /etc/motd
               echo " Connected via SSH - Admin access only " >> /etc/motd
               echo "==========================================" >> /etc/motd
 
-              # Rendre le motd visible à chaque login
+              # Make motd visible at each login
               chmod 644 /etc/motd
               EOF
 
@@ -38,7 +38,7 @@ resource "aws_instance" "bastion" {
   depends_on = [aws_internet_gateway.igw]
 }
 
-# 3️⃣ Elastic IP pour IP publique fixe
+# 3️⃣ Elastic IP for fixed public IP
 resource "aws_eip" "bastion_eip" {
   domain = "vpc"
 
@@ -47,14 +47,14 @@ resource "aws_eip" "bastion_eip" {
   }
 }
 
-# 4️⃣ Association EIP ↔ Bastion
+# 4️⃣ EIP ↔ Bastion Association
 resource "aws_eip_association" "bastion_assoc" {
   instance_id   = aws_instance.bastion.id
   allocation_id = aws_eip.bastion_eip.id
 }
 
 # =============================
-# Bastion Host - AZ b (secondaire)
+# Bastion Host - AZ b (secondary)
 # =============================
 
 resource "aws_instance" "bastion_b" {
@@ -90,6 +90,3 @@ resource "aws_eip_association" "bastion_assoc_b" {
   instance_id   = aws_instance.bastion_b.id
   allocation_id = aws_eip.bastion_eip_b.id
 }
-
-
-
