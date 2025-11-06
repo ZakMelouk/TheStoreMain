@@ -32,7 +32,7 @@ resource "aws_db_parameter_group" "catalog_pg" {
 resource "random_password" "catalog_password" {
   length           = 20
   special          = true
-  override_special = "!#$%^&*()_+=-[]{}:;,.?~" # pas de /, @, "
+  override_special = "!$%^&*()_+=-[]{}:;,.?~" # pas de /, @, "
 }
 
 resource "aws_secretsmanager_secret" "catalog_db_secret" {
@@ -108,6 +108,7 @@ resource "aws_db_instance" "catalog" {
     aws_secretsmanager_secret_policy.catalog_allow_voclabs
   ]
 }
+
 
 
 
