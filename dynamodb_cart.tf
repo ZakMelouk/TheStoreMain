@@ -4,7 +4,7 @@
 
 resource "aws_dynamodb_table" "cart" {
   name           = "cart-items"
-  billing_mode   = "PAY_PER_REQUEST"  # Pas besoin de capacity planning
+  billing_mode   = "PAY_PER_REQUEST"  # No need for capacity planning
   hash_key       = "user_id"
   range_key      = "item_id"
 
@@ -18,12 +18,12 @@ resource "aws_dynamodb_table" "cart" {
     type = "S"
   }
 
-  # Configuration du chiffrement et de la réplication
+  # Encryption and replication configuration
   server_side_encryption {
     enabled = true
   }
 
-  # Tagging pour suivi et traçabilité
+  # Tagging for monitoring and traceability
   tags = {
     Name        = "cart-dynamodb"
     Environment = var.environment
