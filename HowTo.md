@@ -104,6 +104,10 @@ If you haven’t yet set permissions:
 
 3️⃣ SSH into the Bastion Host:
 ``ssh -i ./the-store-bastion-key.pem ec2-user@<BASTION_EIP>``
+Protect the key:
+
+``chmod 400 ~/the-store-bastion-key.pem
+``
 
 4️⃣ From the Bastion, SSH into your Master Node:
 ``ssh -i ~/the-store-bastion-key.pem ec2-user@<MASTER_PRIVATE_IP>``
