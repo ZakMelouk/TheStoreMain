@@ -2,7 +2,7 @@
 # ElastiCache Redis for Checkout (private)
 ###############################################
 
-# 1️⃣ Subnet Group pour Redis
+# 1️⃣ Subnet Group for Redis
 resource "aws_elasticache_subnet_group" "checkout_subnets" {
   name       = "checkout-redis-subnets"
   subnet_ids = [
@@ -15,13 +15,12 @@ resource "aws_elasticache_subnet_group" "checkout_subnets" {
   }
 }
 
-# 2️⃣ Parameter Group (optionnel)
+# 2️⃣ Parameter Group (optional)
 resource "aws_elasticache_parameter_group" "checkout_pg" {
   name        = "checkout-redis-params"
   family      = "redis7"
   description = "Parameter group for Checkout Redis"
 }
-
 
 # 4️⃣ ElastiCache Cluster (Redis)
 resource "aws_elasticache_cluster" "checkout" {
@@ -43,4 +42,3 @@ resource "aws_elasticache_cluster" "checkout" {
   }
 
 }
-
