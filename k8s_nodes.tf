@@ -1,4 +1,4 @@
-# AMI Amazon Linux 2 dynamique
+# Dynamic Amazon Linux 2 AMI
 data "aws_ami" "al2" {
   most_recent = true
   owners      = ["amazon"]
@@ -9,11 +9,11 @@ data "aws_ami" "al2" {
 }
 
 variable "k8s_instance_type" {
-  description = "Type d'instance EC2 pour les nœuds K8S"
+  description = "EC2 instance type for K8S nodes"
   default     = "t3.micro"
 }
 
-# 1) Master en privé (AZ a) -> subnet private_c
+# 1) Master in private subnet (AZ a) -> subnet private_c
 resource "aws_instance" "k8s_master" {
   ami                    = data.aws_ami.al2.id
   instance_type          = var.k8s_instance_type
@@ -21,7 +21,7 @@ resource "aws_instance" "k8s_master" {
   key_name               = aws_key_pair.bastion_key.key_name
   vpc_security_group_ids = [aws_security_group.sg_k8s_nodes.id]
 
-  # PAS d'IP publique en privé -> ne rien mettre
+  # No public IP in private subnet -> leave empty
 
   root_block_device {
     volume_size = 16
@@ -34,11 +34,11 @@ resource "aws_instance" "k8s_master" {
     Project = "the-store"
   }
 
-  # Les nœuds privés ont besoin de la NAT pour sortir
+  # Private nodes need NAT to access the internet
   depends_on = [aws_nat_gateway.nat]
 }
 
-# 2) Workers en privé (répartis AZ a/b) -> subnets private_c / private_d
+# 2) Workers in private subnets (spread across AZ a/b) -> subnets private_c / private_d
 resource "aws_instance" "k8s_worker" {
   count                  = 2
   ami                    = data.aws_ami.al2.id
@@ -60,5 +60,3 @@ resource "aws_instance" "k8s_worker" {
 
   depends_on = [aws_nat_gateway.nat]
 }
-
-
