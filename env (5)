@@ -1,0 +1,17 @@
+# === AUTO-GENERATED .ENV ===
+AWS_REGION=us-east-1
+
+# Endpoint RDS (info)
+CATALOG_DB_ENDPOINT=catalog-mysql.ccwk0sr1sjwi.us-east-1.rds.amazonaws.com:3306
+
+# Endpoint utilisé par l'app via le TUNNEL SSH local
+MYSQL_HOST=host.docker.internal
+MYSQL_PORT=3307
+
+# Identifiants DB
+DB_NAME=catalogdb
+DB_USER=catalog_admin
+DB_PASSWORD=K:!!)SH_H0IdS1B#BNA(
+
+# Si ton app préfère un DSN unique, dé-commente et adapte :
+# RETAIL_CATALOG_PERSISTENCE_URL=mysql://catalog_admin:K:!!)SH_H0IdS1B#BNA(@tcp(host.docker.internal:3307)/catalogdb?parseTime=true
