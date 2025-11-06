@@ -18,10 +18,10 @@ resource "aws_db_subnet_group" "orders_subnets" {
 # 2) (Optional) Parameter Group (tuning)
 resource "aws_db_parameter_group" "orders_pg" {
   name        = "orders-postgres-params"
-  family      = "postgres14" # adapte si tu changes la version
+  family      = "postgres14" # adjust if you change the version
   description = "Parameter group for Orders PostgreSQL"
 
-  # Exemple de paramètre (désactivé par défaut)
+  # Example parameter (disabled by default)
   # parameter {
   #   name  = "log_min_duration_statement"
   #   value = "1000"
@@ -32,8 +32,7 @@ resource "aws_db_parameter_group" "orders_pg" {
 resource "random_password" "orders_password" {
   length           = 20
   special          = true
-  override_special = "!#$%^&*()_+=-[]{}:;,.?~" # pas de /, @, "
-
+  override_special = "!#$%^&*()_+=-[]{}:;,.?~" # no /, @, "
 }
 
 resource "aws_secretsmanager_secret" "orders_db_secret" {
@@ -47,7 +46,7 @@ resource "aws_secretsmanager_secret_version" "orders_db_secret_v" {
     username = var.orders_db_username
     password = random_password.orders_password.result
     engine   = "postgres"
-    host     = null  # sera renseigné après création si besoin
+    host     = null  # will be filled after creation if needed
     port     = 5432
     dbname   = var.orders_db_name
   })
@@ -57,16 +56,16 @@ resource "aws_secretsmanager_secret_version" "orders_db_secret_v" {
 resource "aws_db_instance" "orders" {
   identifier              = "orders-postgres"
   engine                  = "postgres"
-  engine_version          = var.orders_engine_version    # ex. "14.12"
-  instance_class          = var.orders_instance_class    # ex. "db.t3.micro"
-  allocated_storage       = var.orders_allocated_storage # ex. 20
-  max_allocated_storage   = var.orders_max_allocated_storage # ex. 100
+  engine_version          = var.orders_engine_version    # e.g. "14.12"
+  instance_class          = var.orders_instance_class    # e.g. "db.t3.micro"
+  allocated_storage       = var.orders_allocated_storage # e.g. 20
+  max_allocated_storage   = var.orders_max_allocated_storage # e.g. 100
   storage_encrypted       = true
 
   # Networking
   db_subnet_group_name    = aws_db_subnet_group.orders_subnets.name
   vpc_security_group_ids  = [aws_security_group.sg_db.id]
-  publicly_accessible     = false          # ❗ privé
+  publicly_accessible     = false          # ❗ private
   multi_az                = true          
 
   # Auth
@@ -78,11 +77,11 @@ resource "aws_db_instance" "orders" {
   port                    = 5432
   parameter_group_name    = aws_db_parameter_group.orders_pg.name
 
-  # Maintenance windows (facultatif, valeurs par défaut ok)
+  # Maintenance windows (optional, default values are fine)
   auto_minor_version_upgrade = true
-  backup_retention_period    = 1           # POC : minime
-  deletion_protection        = false       # POC : false (destroy facile)
-  skip_final_snapshot        = true        # POC : pas de snapshot à la destruction
+  backup_retention_period    = 1           # POC: minimal
+  deletion_protection        = false       # POC: false (easy destroy)
+  skip_final_snapshot        = true        # POC: no snapshot on destroy
 
   tags = {
     Name = "orders-postgres"
@@ -91,6 +90,3 @@ resource "aws_db_instance" "orders" {
   }
 
 }
-
-
-
