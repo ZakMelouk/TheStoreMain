@@ -13,6 +13,10 @@ output "orders_rds_port" {
   description = "Port for Orders PostgreSQL"
   value       = aws_db_instance.orders.port
 }
+output "catalog_db_name" {
+  description = "DB name for Catalog"
+  value       = var.catalog_db_name
+}
 
 output "orders_db_secret_arn" {
   description = "ARN of the Secrets Manager secret for Orders DB credentials"
@@ -78,4 +82,5 @@ output "k8s_worker_private_ips" {
   description = "Private IPs of the Kubernetes worker nodes"
   value       = [for w in aws_instance.k8s_worker : w.private_ip]
 }
+
 
