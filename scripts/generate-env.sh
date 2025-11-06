@@ -1,10 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# --- Resolve paths relative to this script ---
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+TF_DIR="${TF_DIR:-$REPO_ROOT/terraform}"
+OUTPUT_FILE="${OUTPUT_FILE:-$REPO_ROOT/.env}"
+
 # --- Config overridable via environment variables (otherwise default values) ---
 AWS_REGION="${AWS_REGION:-us-east-1}"
-TF_DIR="${TF_DIR:-.}"
-OUTPUT_FILE="${OUTPUT_FILE:-.env}"
 
 # Local TUNNEL (Option A): host/port visible from your containers
 MYSQL_HOST="${MYSQL_HOST:-host.docker.internal}"
@@ -16,10 +20,10 @@ command -v terraform >/dev/null || { echo "❌ Missing Terraform"; exit 1; }
 command -v python3 >/dev/null || { echo "❌ Missing python3"; exit 1; }
 
 echo "==> Reading Terraform outputs..."
-RDS_ENDPOINT=$(cd "$TF_DIR" && terraform output -raw catalog_rds_endpoint)   # e.g. catalog-mysql.xxx.rds.amazonaws.com
-DB_NAME=$(cd "$TF_DIR" && terraform output -raw catalog_db_name)
-DB_USER=$(cd "$TF_DIR" && terraform output -raw catalog_db_username)
-SECRET_ARN=$(cd "$TF_DIR" && terraform output -raw catalog_secret_arn)
+RDS_ENDPOINT=$(terraform -chdir="$TF_DIR" output -raw catalog_rds_endpoint)
+DB_NAME=$(terraform -chdir="$TF_DIR" output -raw catalog_db_name)
+DB_USER=$(terraform -chdir="$TF_DIR" output -raw catalog_db_username)
+SECRET_ARN=$(terraform -chdir="$TF_DIR" output -raw catalog_secret_arn)
 
 echo "==> Retrieving password from Secrets Manager..."
 RAW_SECRET=$(aws secretsmanager get-secret-value \
@@ -34,7 +38,7 @@ print(json.loads(os.environ["RAW_SECRET"])["password"])
 PY
 )
 
-echo "==> Generating .env file..."
+echo "==> Generating .env file at: $OUTPUT_FILE"
 cat > "$OUTPUT_FILE" <<EOF
 # === AUTO-GENERATED .ENV ===
 AWS_REGION=$AWS_REGION
@@ -55,5 +59,5 @@ DB_PASSWORD=${DB_PASSWORD}
 # RETAIL_CATALOG_PERSISTENCE_URL=mysql://${DB_USER}:${DB_PASSWORD}@tcp(${MYSQL_HOST}:${MYSQL_PORT})/${DB_NAME}?parseTime=true
 EOF
 
-echo "✅ .env created:"
+echo "✅ .env created successfully!"
 sed 's/DB_PASSWORD=.*/DB_PASSWORD=****/' "$OUTPUT_FILE"
