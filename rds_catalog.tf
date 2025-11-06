@@ -21,7 +21,7 @@ resource "aws_db_parameter_group" "catalog_pg" {
   family      = "mysql8.0"
   description = "Parameter group for Catalog MySQL"
 
-  # Exemple param optionnel
+  # Example optional parameter
   # parameter {
   #   name  = "slow_query_log"
   #   value = "1"
@@ -32,7 +32,7 @@ resource "aws_db_parameter_group" "catalog_pg" {
 resource "random_password" "catalog_password" {
   length           = 20
   special          = true
-  override_special = "!$%^&*()_+=-[]{}:;,.?~" # pas de /, @, "
+  override_special = "!$%^&*()_+=-[]{}:;,.?~" # no /, @, "
 }
 
 resource "aws_secretsmanager_secret" "catalog_db_secret" {
@@ -52,7 +52,7 @@ resource "aws_secretsmanager_secret_version" "catalog_db_secret_v" {
   })
 }
 
-# 3.b ✅ (Optionnel) policy pour un rôle spécifique (voclabs) qui peut lire le secret
+# 3.b ✅ (Optional) policy for a specific role (voclabs) that can read the secret
 data "aws_caller_identity" "current" {}
 
 resource "aws_secretsmanager_secret_policy" "catalog_allow_voclabs" {
@@ -90,7 +90,7 @@ resource "aws_db_instance" "catalog" {
   port                 = 3306
   parameter_group_name = aws_db_parameter_group.catalog_pg.name
 
-  # Options démo
+  # Demo options
   auto_minor_version_upgrade = true
   backup_retention_period    = 1
   deletion_protection        = false
@@ -108,7 +108,3 @@ resource "aws_db_instance" "catalog" {
     aws_secretsmanager_secret_policy.catalog_allow_voclabs
   ]
 }
-
-
-
-
