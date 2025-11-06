@@ -45,7 +45,7 @@ resource "aws_security_group" "sg_bastion" {
 # ==============================================================
 # 2️⃣ Public Security Group (for Internet access)
 # --------------------------------------------------------------
-# Used for instances that require access to the Internet (e.g. Bastion Host).
+# Used for instances that require Internet access (e.g. Bastion Host).
 # Allows HTTP/HTTPS outbound and optionally inbound (if needed).
 # ==============================================================
 resource "aws_security_group" "sg_public" {
@@ -54,7 +54,7 @@ resource "aws_security_group" "sg_public" {
   vpc_id      = aws_vpc.main.id
 
   ingress {
-    description = "Optional HTTPS access (if Bastion has web interface)"
+    description = "Optional HTTPS access (if Bastion has a web interface)"
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
@@ -105,7 +105,6 @@ resource "aws_security_group" "sg_db" {
     security_groups = [aws_security_group.sg_bastion.id]
   }
 
-
   egress {
     description = "Allow all outbound traffic"
     from_port   = 0
@@ -118,7 +117,8 @@ resource "aws_security_group" "sg_db" {
     Name = "database-sg"
   }
 }
-# 3️⃣ Security Group (autoriser uniquement le Bastion)
+
+# 3️⃣ Security Group (allow only Bastion)
 resource "aws_security_group" "sg_redis" {
   name        = "redis-sg"
   description = "Allow Bastion access to Redis"
@@ -148,7 +148,7 @@ resource "aws_security_group" "sg_k8s_nodes" {
   name   = "k8s-nodes-sg"
   vpc_id = aws_vpc.main.id
 
-  # SSH depuis le bastion uniquement
+  # SSH from bastion only
   ingress {
     description     = "SSH from bastion"
     from_port       = 22
@@ -157,7 +157,7 @@ resource "aws_security_group" "sg_k8s_nodes" {
     security_groups = [aws_security_group.sg_bastion.id]
   }
 
-  # Intra-cluster (simple et efficace)
+  # Intra-cluster (simple and effective)
   ingress {
     description = "All within k8s nodes"
     from_port   = 0
@@ -166,7 +166,7 @@ resource "aws_security_group" "sg_k8s_nodes" {
     self        = true
   }
 
-  # Sortie Internet (via NAT)
+  # Internet egress (via NAT)
   egress {
     from_port   = 0
     to_port     = 0
@@ -176,4 +176,3 @@ resource "aws_security_group" "sg_k8s_nodes" {
 
   tags = { Name = "sg-k8s-nodes" }
 }
-
