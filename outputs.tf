@@ -83,4 +83,17 @@ output "k8s_worker_private_ips" {
   value       = [for w in aws_instance.k8s_worker : w.private_ip]
 }
 
+output "catalog_db_username" {
+  description = "Master username for Catalog"
+  value       = var.catalog_db_username
+}
+output "catalog_rds_endpoint" {
+  description = "Endpoint for Catalog MySQL"
+  value       = aws_db_instance.catalog.address
+}
+
+output "catalog_rds_port" {
+  description = "Port for Catalog MySQL"
+  value       = aws_db_instance.catalog.port
+}
 
