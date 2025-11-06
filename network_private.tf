@@ -156,8 +156,6 @@ resource "aws_vpc_endpoint" "dynamodb" {
   vpc_endpoint_type = "Gateway"
 
   route_table_ids = [
-    aws_route_table.private.id,
-    aws_route_table.private_b.id,
     aws_route_table.private_db.id
   ]
 
@@ -165,3 +163,4 @@ resource "aws_vpc_endpoint" "dynamodb" {
     Name = "the-store-dynamodb-endpoint"
   }
 }
+
