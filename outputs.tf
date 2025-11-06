@@ -87,13 +87,5 @@ output "catalog_db_username" {
   description = "Master username for Catalog"
   value       = var.catalog_db_username
 }
-output "catalog_rds_endpoint" {
-  description = "Endpoint for Catalog MySQL"
-  value       = aws_db_instance.catalog.address
-}
 
-output "catalog_rds_port" {
-  description = "Port for Catalog MySQL"
-  value       = aws_db_instance.catalog.port
-}
 
